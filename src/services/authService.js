@@ -1,13 +1,12 @@
-const bcrypt = require('bcryptjs');
+import bcrypt from 'bcryptjs';
 
-async function gerarHash(senha) {
+export async function gerarHash(senha) {
     const saltRounds = 10;
     const hash = await bcrypt.hash(senha, saltRounds);
     return hash;
 }
 
-async function verificarSenha(senhaDigitada, hashSalvo) {
+export async function verificarSenha(senhaDigitada, hashSalvo) {
     const correspondencia = await bcrypt.compare(senhaDigitada, hashSalvo);
     return correspondencia;
 }
-module.exports = { gerarHash, verificarSenha };
