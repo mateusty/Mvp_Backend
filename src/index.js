@@ -1,13 +1,13 @@
-const express = require('express');
-const app = express();
-const PORT = 8080;
+import express from 'express';
+import authRoutes from './routes/authRoute.js';
 
-const loginRoutes = require('./routes/loginRoute');
+const app = express();
+const PORT = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/login', loginRoutes);
+app.use('/auth', authRoutes);
 
 app.listen(PORT, () => {
     console.log("Ta funcionando")

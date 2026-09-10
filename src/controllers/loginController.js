@@ -1,12 +1,16 @@
-const authService = require("../services/authService");
+import { CadastrarUsuario, LogarUsuario } from '../services/userService.js';
 
-const doLogin = async (req, res) => {
-    const hash = await authService.gerarHash(req.body.password); 
-    res.json(hash);
+
+// mudar depois
+export const doRegister = async (req, res) => {
+    await CadastrarUsuario(req.body);
+    res.json({response: "Usuário cadastrado com sucesso!"});
 }
 
-module.exports = {
-    doLogin
+// mudar depois
+export const doLogin = async (req, res) => {
+    if (await LogarUsuario(req.body)) {
+        res.json({response: "Usuário logado com sucesso"})
+    }
+    else res.json({response: "Senha incorreta"})
 }
-
-/*node ./src/index.js*/
