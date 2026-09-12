@@ -1,10 +1,28 @@
-import { CadastrarUsuario, LogarUsuario } from '../services/userService.js';
+const{ gerartoken} = require('../services/authService');
 
+const doLogin = (req, res) => {
+     const {email, senha} = req.body;
 
-// mudar depois
-export const doRegister = async (req, res) => {
-    await CadastrarUsuario(req.body);
-    res.json({response: "Usuário cadastrado com sucesso!"});
+     // SIMULAÇÃO: Estrutura do usuário que futuramente virá da consulta ao PostgreSQL
+    const usuarioBanco = {
+        id: 1,
+        email: email,
+        ehGuia: true
+    };
+
+    const token = gerartoken(usuarioBanco);
+
+    //Retorna o token para o cliente
+    return res.status(200).json({ 
+        menssagem: 'Login realizado com sucesso',
+        token: token,
+        usuario: {
+            id: usuarioBanco.id,
+            email: usuarioBanco.email,
+            ehGuia: usuarioBanco.ehGuia
+        } 
+    });
+
 }
 
 // mudar depois
