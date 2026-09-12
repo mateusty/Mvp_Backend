@@ -25,6 +25,10 @@ const doLogin = (req, res) => {
 
 }
 
-module.exports = {
-    doLogin
+// mudar depois
+export const doLogin = async (req, res) => {
+    if (await LogarUsuario(req.body)) {
+        res.json({response: "Usuário logado com sucesso"})
+    }
+    else res.json({response: "Senha incorreta"})
 }
