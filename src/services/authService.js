@@ -1,31 +1,33 @@
-const jwt = require('jsonwebtoken');
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
-// Esta é a chave secreta que assina o token
-const SECRET_KEY = 'chave_secreta_tereverde';
 
-/**
- * Gera o Token JWT para o usuário autenticado
- * @param {Object} usuario Objeto contendo id, email e perfil do usuário
- * @returns {string} Token JWT assinado
- */
+export async function gerarHash(password) {
 
-    function gerartoken(usuario) {
-        const token = jwt.sign(
+    const hash = await bcrypt.hash(password, 10);
+
+    return hash;
+}
+
+
+export async function verificarSenha(password, hash) {
+
+    return await bcrypt.compare(password, hash);
+}
+
+
+export function gerarToken(usuario) {
+
+    const token = jwt.sign(
         {
             id: usuario.id,
-            email: usuario.email,
-            ehGuia: usuario.ehGuia
+            email: usuario.email
         },
-        SECRET_KEY,
+        process.env.JWT_SECRET,
         {
-            expiresIn: '2h' // O token expira em 2 hora
+            expiresIn: "2h"
         }
     );
 
     return token;
 }
-
-module.exports = {
-    gerartoken,
-    SECRET_KEY
-};

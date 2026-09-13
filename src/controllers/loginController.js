@@ -1,34 +1,67 @@
-const{ gerartoken} = require('../services/authService');
+import {
+    cadastrarUsuario,
+    logarUsuario
+} from "../services/userService.js";
 
-const doLogin = (req, res) => {
-     const {email, senha} = req.body;
+import {
+    gerarToken
+} from "../services/authService.js";
 
-     // SIMULAÇÃO: Estrutura do usuário que futuramente virá da consulta ao PostgreSQL
-    const usuarioBanco = {
-        id: 1,
-        email: email,
-        ehGuia: true
-    };
 
-    const token = gerartoken(usuarioBanco);
+export async function doRegister(req, res) {
 
-    //Retorna o token para o cliente
-    return res.status(200).json({ 
-        menssagem: 'Login realizado com sucesso',
-        token: token,
-        usuario: {
-            id: usuarioBanco.id,
-            email: usuarioBanco.email,
-            ehGuia: usuarioBanco.ehGuia
-        } 
-    });
+    try {
 
+        await cadastrarUsuario(req.body);
+
+        return res.status(201).json({
+            mensagem: "Usuário cadastrado com sucesso"
+        });
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        return res.status(500).json({
+            mensagem: "Erro ao cadastrar usuário"
+        });
+
+    }
 }
 
-// mudar depois
-export const doLogin = async (req, res) => {
-    if (await LogarUsuario(req.body)) {
-        res.json({response: "Usuário logado com sucesso"})
+
+export async function doLogin(req, res) {
+
+    try {
+
+        const usuario = await logarUsuario(req.body);
+
+        if (!usuario) {
+
+            return res.status(401).json({
+                mensagem: "Email ou senha incorretos"
+            });
+
+        }
+
+        const token = gerarToken(usuario);
+
+        return res.status(200).json({
+            mensagem: "Login realizado com sucesso",
+            token: token,
+            usuario: {
+                id: usuario.id,
+                email: usuario.email
+            }
+        });
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        return res.status(500).json({
+            mensagem: "Erro interno no servidor"
+        });
+
     }
-    else res.json({response: "Senha incorreta"})
 }
