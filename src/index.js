@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require('express');
 const app = express();
 const PORT = 8080;
@@ -12,3 +13,4 @@ app.use('/login', loginRoutes);
 app.listen(PORT, () => {
     console.log("Ta funcionando")
 });
+

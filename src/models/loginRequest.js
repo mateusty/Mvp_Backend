@@ -7,3 +7,4 @@ class LoginRequest{
         this.password = data.password;
     }
 }
+module.exports = LoginRequest;
