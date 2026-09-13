@@ -1,27 +1,52 @@
-const jwt  = require('jsonwebtoken');
-const { SECRET_KEY } = require('../services/authService'); 
+import jwt from "jsonwebtoken";
 
-function autenticartoken(req, res, next) {
 
-    // 1. Captura o cabeçalho authorization da requisição
-    const authHeader = req.headers['authorization']
+export function autenticarToken(req, res, next) {
 
-    const token = authHeader && authHeader.split(' ')[1];
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
-        return res.status(401).json({ mensagem: 'Acesso negado. Token não fornecido!' });
+    const [tipo, token] = authHeader?.split(" ") ?? [];
+
+
+    if (tipo !== "Bearer" || !token) {
+
+        return res.status(401).json({
+            mensagem: "Acesso negado. Token não fornecido!"
+        });
+
     }
 
-    jwt.verify(token, SECRET_KEY, (err, usuarioDecodificado) => {
-        if (err) {
-            return res.status(403).json({ mensagem: 'Token inválido ou expirado!' });
-        }
-        
-        // Anexa os dados do usuario (id, email, ehGuia) dentro do objeto req
+
+    try {
+
+        const usuarioDecodificado = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
+
         req.usuario = usuarioDecodificado;
-       
-        next();
-    });
+
+        return next();
+
+    } catch (erro) {
+
+        return res.status(401).json({
+            mensagem: "Token inválido ou expirado!"
+        });
+
+    }
 }
 
-module.exports =  autenticartoken;
+
+export function somenteAdmin(req, res, next) {
+
+    if (!req.usuario || req.usuario.role !== "admin") {
+
+        return res.status(403).json({
+            mensagem: "Acesso permitido somente para administradores!"
+        });
+
+    }
+
+    return next();
+}
