@@ -8,7 +8,7 @@
 
 # Sobre o projeto:
 Este repositório foi criado para apresentar a parte por trás dos panos do nosso primeiro projeto de Front-End, integrando a parte dois do
-MVP proposto pela grade curricular da unifeso
+MVP proposto pela grade curricular da unifeso.
 
  Para acessar o site: 🔗 [Link para o site](https://mateusty.github.io/MVP-FrontEnd)
 
