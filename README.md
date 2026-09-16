@@ -25,10 +25,10 @@ tornar a aplicação Front-End um MVP funcional unindo as funcionalidades do bac
 - Roger Cesar de Souza Pacheco
 
 ## Técnologias Utilizadas:
-- biblioteca Bcrypt para hash de senhas
-- thunder-client para teste de endpoint
-- Postgree para banco de dados
-- Javascript para criação de servidor http(porta 8080)
+- biblioteca Bcrypt para hash de senhas.
+- thunder-client para teste de endpoint.
+- Postgree para banco de dados.
+- Javascript para criação de servidor http(porta 8080).
 
 ## Requisitos:
 
