@@ -6,7 +6,7 @@
   <img width=230 px height=200 px alt="logo" src="https://github.com/user-attachments/assets/278beb5f-a1e0-4eca-9bb1-4cc6474dad8a" />
 </div>
 
-  #Sobre o projeto:
+# Sobre o projeto:
 Este repositório foi criado para apresentar a parte por trás dos panos do nosso primeiro projeto de Front-End, integrando a parte dois do
 MVP proposto pela grade curricular da unifeso
 
@@ -25,10 +25,10 @@ tornar a aplicação Front-End um MVP funcional unindo as funcionalidades do bac
 - Roger Cesar de Souza Pacheco
 
 ## Técnologias Utilizadas:
-- biblioteca Bcypt para hash de senhas
+- biblioteca Bcrypt para hash de senhas
 - thunder-client para teste de endpoint
 - Postgree para banco de dados
-- Javascript para criação de servidor http
+- Javascript para criação de servidor http(porta 8080)
 
 ## Requisitos:
 
