@@ -1,4 +1,4 @@
-class LoginRequest{
+export class LoginRequest{
     email;
     password;
 
