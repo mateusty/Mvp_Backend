@@ -97,3 +97,19 @@ export async function logarUsuario(user) {
         role: usuarioBanco.role
     };
 }
+
+export async function buscarUsuarioPorId(id) {
+    
+    const usuario = await db.oneOrNone(
+        `
+        SELECT
+            id,
+            email,
+            role,
+            created_at
+        FROM users
+        WHERE id = $1
+        `,
+        [id]
+    )
+}

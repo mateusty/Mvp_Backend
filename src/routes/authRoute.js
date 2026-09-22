@@ -8,7 +8,7 @@ import {
 import {
     autenticarToken,
     somenteAdmin
-} from "../services/authMiddLeware.js";
+} from "../services/authMiddleware.js";
 
 
 const router = express.Router();
@@ -52,6 +52,18 @@ router.get(
         });
 
     }
+);
+
+import {
+    doRegister,
+    doLogin,
+    getMe
+} from "../controllers/loginCrontroller.js";
+
+router.get(
+    "/me",
+    autenticarToken,
+    getMe
 );
 
 

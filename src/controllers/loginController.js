@@ -124,3 +124,33 @@ export async function doLogin(req, res) {
 
     }
 }
+
+import {
+    cadastraUsuario,
+    logarUsuario,
+    buscarUsuarioPorId
+} from "../service/userService.js";
+
+export async function getME(req, res){
+
+    try {
+        const usuario = await buscarUsuarioPorId(req.usuario.id);
+
+        if (!usuario) {
+            return res.status(404).json({
+                mensagem: "Usuário não encontrado."
+            });
+        }
+
+        return res.status(200).json({
+            mensagem: "Dados do Usuário."
+        });
+
+    } catch (erro) {
+        console.error(erro);
+
+        return res.status(500).json({
+            mensagem: "Erro interno no servidor."
+        });
+    }
+}
