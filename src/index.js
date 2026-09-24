@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import express from "express";
+import cors from "cors";
 
 import authRoutes from "./routes/authRoute.js";
 
@@ -22,6 +23,10 @@ app.use(
         extended: true
     })
 );
+
+app.use(cors({
+    origin: 'https://mateusty.github.io/MVP-FrontEnd',
+}));
 
 
 app.get("/health", (req, res) => {
