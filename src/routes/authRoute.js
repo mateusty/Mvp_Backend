@@ -2,7 +2,8 @@ import express from "express";
 
 import {
     doRegister,
-    doLogin
+    doLogin,
+    getMe
 } from "../controllers/loginController.js";
 
 import {
@@ -10,21 +11,21 @@ import {
     somenteAdmin
 } from "../services/authMiddleware.js";
 
+import { validarCampos } from "../services/validationMiddleware.js";
 
 const router = express.Router();
 
-
 router.post(
     "/register",
+    validarCampos(["email", "password"]),
     doRegister
 );
 
-
 router.post(
     "/login",
+    validarCampos(["email", "password"]),
     doLogin
 );
-
 
 router.get(
     "/perfil",
@@ -35,10 +36,8 @@ router.get(
             mensagem: "Acesso autorizado",
             usuario: req.usuario
         });
-
     }
 );
-
 
 router.get(
     "/admin",
@@ -50,15 +49,8 @@ router.get(
             mensagem: "Acesso autorizado para administrador",
             usuario: req.usuario
         });
-
     }
 );
-
-import {
-    doRegister,
-    doLogin,
-    getMe
-} from "../controllers/loginCrontroller.js";
 
 router.get(
     "/me",

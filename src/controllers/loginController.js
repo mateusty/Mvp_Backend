@@ -1,12 +1,12 @@
 import {
-    cadastrarUsuario,
-    logarUsuario
-} from "../services/userService.js";
-
-import {
     gerarToken
 } from "../services/authService.js";
 
+import {
+    cadastrarUsuario,
+    logarUsuario,
+    buscarUsuarioPorId
+} from "../services/userService.js";
 
 export async function doRegister(req, res) {
 
@@ -125,15 +125,10 @@ export async function doLogin(req, res) {
     }
 }
 
-import {
-    cadastraUsuario,
-    logarUsuario,
-    buscarUsuarioPorId
-} from "../service/userService.js";
-
-export async function getME(req, res){
+export async function getMe(req, res){
 
     try {
+
         const usuario = await buscarUsuarioPorId(req.usuario.id);
 
         if (!usuario) {
@@ -143,7 +138,8 @@ export async function getME(req, res){
         }
 
         return res.status(200).json({
-            mensagem: "Dados do Usuário."
+            mensagem: "Dados do Usuário.",
+            usuario
         });
 
     } catch (erro) {
