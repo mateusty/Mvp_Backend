@@ -9,7 +9,7 @@ import {
 import {
     autenticarToken,
     somenteAdmin
-} from "../services/authMiddleware.js";
+} from "../services/authMiddLeware.js";
 
 import { validarCampos } from "../services/validationMiddleware.js";
 

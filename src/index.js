@@ -4,11 +4,11 @@ import express from "express";
 import cors from "cors";
 
 import authRoutes from "./routes/authRoute.js";
-
+import trilhaRoute from "./routes/trilhaRoute.js";
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 
 if (!process.env.JWT_SECRET) {
@@ -24,9 +24,12 @@ app.use(
     })
 );
 
-app.use(cors({
-    origin: 'https://mateusty.github.io/MVP-FrontEnd',
-}));
+
+app.use(
+    cors({
+        origin: "https://mateusty.github.io/MVP-FrontEnd"
+    })
+);
 
 
 app.get("/health", (req, res) => {
@@ -38,12 +41,12 @@ app.get("/health", (req, res) => {
 });
 
 
-app.use(
-    "/auth",
-    authRoutes
-);
+app.use("/auth", authRoutes);
+
+app.use("/trilhas", trilhaRoute);
 
 
+// O 404 sempre precisa ficar depois das rotas
 app.use((req, res) => {
 
     return res.status(404).json({
