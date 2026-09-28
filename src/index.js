@@ -5,6 +5,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/authRoute.js";
 import trilhaRoute from "./routes/trilhaRoute.js";
+import eventRoute from "./routes/eventRoute.js";
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use("/auth", authRoutes);
 
 app.use("/trilhas", trilhaRoute);
 
+app.use("/eventos", eventRoute);
 
 // O 404 sempre precisa ficar depois das rotas
 app.use((req, res) => {
