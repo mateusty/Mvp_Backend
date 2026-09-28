@@ -1,19 +1,67 @@
 import "dotenv/config";
+
 import express from "express";
+import cors from "cors";
+
 import authRoutes from "./routes/authRoute.js";
+import trilhaRoute from "./routes/trilhaRoute.js";
+import eventRoute from "./routes/eventRoute.js";
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
+
+
+if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET não configurado no .env");
+}
+
 
 app.use(express.json());
 
-app.use(express.urlencoded({
-    extended: true
-}));
+app.use(
+    express.urlencoded({
+        extended: true
+    })
+);
+
+
+app.use(
+    cors({
+        origin: "https://mateusty.github.io/MVP-FrontEnd"
+    })
+);
+
+
+app.get("/health", (req, res) => {
+
+    return res.status(200).json({
+        status: "ok"
+    });
+
+});
+
 
 app.use("/auth", authRoutes);
 
+app.use("/trilhas", trilhaRoute);
+
+app.use("/eventos", eventRoute);
+
+// O 404 sempre precisa ficar depois das rotas
+app.use((req, res) => {
+
+    return res.status(404).json({
+        mensagem: "Rota não encontrada"
+    });
+
+});
+
+
 app.listen(PORT, () => {
-    console.log(`Servidor funcionando na porta ${PORT}`);
+
+    console.log(
+        `Servidor funcionando na porta ${PORT}`
+    );
+
 });
