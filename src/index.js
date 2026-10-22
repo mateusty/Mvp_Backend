@@ -26,9 +26,15 @@ app.use(
 );
 
 
+const origensPermitidas = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://mateusty.github.io"
+];
+
 app.use(
     cors({
-        origin: "https://mateusty.github.io/MVP-FrontEnd"
+        origin: origensPermitidas
     })
 );
 
