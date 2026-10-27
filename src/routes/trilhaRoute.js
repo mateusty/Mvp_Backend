@@ -1,49 +1,55 @@
+
 import express from "express";
 
 import {
-    criarTrilha,
-    listarTrilhas,
-    buscarTrilha,
-    atualizarTrilha,
-    excluirTrilha
+  criarTrilha,
+  listarTrilhas,
+  buscarTrilha,
+  atualizarTrilha,
+  excluirTrilha
 } from "../controllers/trilhaController.js";
 
 import {
-    autenticarToken,
-    somenteAdmin
+  autenticarToken,
+  somenteAdmin
 } from "../services/authMiddLeware.js";
 
+import {
+  enviarImagemTrilha
+} from "../controllers/UploadController.js";
 
 const router = express.Router();
 
-
-// público
 router.get("/", listarTrilhas);
+
+router.post(
+  "/upload",
+  autenticarToken,
+  somenteAdmin,
+  enviarImagemTrilha
+);
 
 router.get("/:id", buscarTrilha);
 
-
-// somente admin
 router.post(
-    "/",
-    autenticarToken,
-    somenteAdmin,
-    criarTrilha
+  "/",
+  autenticarToken,
+  somenteAdmin,
+  criarTrilha
 );
 
 router.put(
-    "/:id",
-    autenticarToken,
-    somenteAdmin,
-    atualizarTrilha
+  "/:id",
+  autenticarToken,
+  somenteAdmin,
+  atualizarTrilha
 );
 
 router.delete(
-    "/:id",
-    autenticarToken,
-    somenteAdmin,
-    excluirTrilha
+  "/:id",
+  autenticarToken,
+  somenteAdmin,
+  excluirTrilha
 );
-
 
 export default router;
