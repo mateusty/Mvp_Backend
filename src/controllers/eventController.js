@@ -16,7 +16,8 @@ export async function criarEvento(req, res) {
             local,
             tema,
             data_horario,
-            limite_pessoas
+            limite_pessoas,
+            google_maps_url // Adicionado como opcional
         } = req.body;
 
         const capacidade = Number(limite_pessoas);
@@ -33,7 +34,8 @@ export async function criarEvento(req, res) {
             local: local.trim(),
             tema: tema.trim(),
             data_horario,
-            limite_pessoas: capacidade
+            limite_pessoas: capacidade,
+            google_maps_url: google_maps_url?.trim() || null // Opcional: salva o link limpo ou null se não enviado
         };
 
         const evento = await criarEventoService(dadosEvento);
@@ -111,6 +113,11 @@ export async function atualizarEvento(req, res) {
                     mensagem: "O limite de pessoas deve ser maior que zero."
                 });
             }
+        }
+
+        // Se o google_maps_url vier na atualização, tratamos opcionalmente
+        if (dados.google_maps_url !== undefined) {
+            dados.google_maps_url = dados.google_maps_url?.trim() || null;
         }
 
         const eventoAtualizado = await atualizarEventoService(id, dados);
