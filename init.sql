@@ -39,8 +39,6 @@ CREATE TABLE IF NOT EXISTS presencas (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     event_id UUID REFERENCES events(id) ON DELETE CASCADE,
-    nome VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT unique_email_event UNIQUE (event_id, email)
 );
