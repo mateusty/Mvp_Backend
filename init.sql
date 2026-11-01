@@ -45,7 +45,6 @@ CREATE TABLE IF NOT EXISTS presencas (
     CONSTRAINT unique_email_event UNIQUE (event_id, email)
 );
 
-
 INSERT INTO users (nome_usuario, email, password_hash, role)
 VALUES (
     'Administrador',

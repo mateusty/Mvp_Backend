@@ -68,7 +68,7 @@ app.use("/trilhas", trilhaRoute);
 
 app.use("/eventos", eventRoute);
 
-app.use("/eventos", presenceRoute);
+app.use("/presencas", presenceRoute);
 
 app.use((req, res) => {
   return res.status(404).json({

@@ -1,3 +1,4 @@
+import db from "../config/database.js";
 import { marcarPresencaService, desmarcarPresencaService } from "../services/presenceService.js";
 
 export async function marcarPresenca(req, res) {
@@ -33,21 +34,36 @@ export async function marcarPresenca(req, res) {
 
 export async function desmarcarPresenca(req, res) {
     try {
-        const { eventId } = req.params;
-        const { email } = req.body;
+        const { eventId, id } = req.params;
+        const { email } = req.body || {};
 
+       
+        if (id) {
+            const resultado = await db.result("DELETE FROM presencas WHERE id = $1;", [id]);
+            
+            if (resultado.rowCount === 0) {
+                return res.status(404).json({ mensagem: "Presença não encontrada." });
+            }
+
+            return res.status(200).json({ mensagem: "Presença removida com sucesso!" });
+        }
+
+        
         if (!email) {
             return res.status(400).json({ mensagem: "E-mail é obrigatório para desmarcar." });
         }
 
-        const removido = await desmarcarPresencaService(eventId, email);
+        const presencaRemovida = await desmarcarPresencaService(eventId, email);
 
-        if (!removido) {
-            return res.status(404).json({ mensagem: "Inscrição não encontrada para este e-mail neste evento." });
+        return res.status(200).json({
+            mensagem: "Presença removida com sucesso.",
+            presenca: presencaRemovida
+        });
+    } catch (erro) {
+        if (erro.message === "PRESENCA_NAO_ENCONTRADA") {
+            return res.status(404).json({ mensagem: "Inscrição não encontrada para este e-mail." });
         }
 
-        return res.status(200).json({ mensagem: "Presença desmarcada com sucesso." });
-    } catch (erro) {
         console.error(erro);
         return res.status(500).json({ mensagem: "Erro interno ao desmarcar presença." });
     }

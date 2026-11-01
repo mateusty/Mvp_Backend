@@ -34,8 +34,26 @@ export async function criarEventoService(dados) {
 }
 
 export async function listarEventosService() {
+    const query = `
+        SELECT 
+            e.*,
+            COALESCE(
+                json_agg(
+                    json_build_object(
+                        'id', p.id,
+                        'nome', p.nome,
+                        'email', p.email
+                    )
+                ) FILTER (WHERE p.id IS NOT NULL), 
+                '[]'
+            ) AS participantes
+        FROM events e
+        LEFT JOIN presencas p ON e.id = p.event_id
+        GROUP BY e.id
+        ORDER BY e.data_evento ASC;
+    `;
 
-    return await db.any("SELECT * FROM events ORDER BY data_evento ASC;");
+    return await db.any(query);
 }
 
 export async function buscarEventoService(id) {
