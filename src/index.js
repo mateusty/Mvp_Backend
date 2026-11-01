@@ -1,4 +1,3 @@
-
 import "dotenv/config";
 
 import express from "express";
@@ -9,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import authRoutes from "./routes/authRoute.js";
 import trilhaRoute from "./routes/trilhaRoute.js";
 import eventRoute from "./routes/eventRoute.js";
+import presenceRoute from "./routes/presenceRoute.js";
 
 const app = express();
 
@@ -67,6 +67,8 @@ app.use("/auth", authRoutes);
 app.use("/trilhas", trilhaRoute);
 
 app.use("/eventos", eventRoute);
+
+app.use("/eventos", presenceRoute);
 
 app.use((req, res) => {
   return res.status(404).json({

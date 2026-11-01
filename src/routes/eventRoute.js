@@ -17,22 +17,21 @@ import { validarCampos } from "../services/validationMiddleware.js";
 
 const router = express.Router();
 
-// Rotas públicas (Leitura)
 router.get("/", listarEventos);
 router.get("/:id", buscarEvento);
 
-// Rotas restritas (Apenas Admins Autenticados)
 router.post(
     "/",
     autenticarToken,
     somenteAdmin,
     validarCampos([
-        "titulo",
-        "descricao",
-        "local",
-        "tema",
-        "data_horario",
-        "limite_pessoas"
+        "atividade",
+        "descricao",        
+        "localizacao",
+        "parque",
+        "capacidade_maxima",
+        "data_evento",
+        "google_maps_url"  
     ]),
     criarEvento
 );
