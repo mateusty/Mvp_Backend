@@ -12,6 +12,23 @@ services:
     volumes:
       - database-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+  web:
+    build: .
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+    - .:/app
+    - /app/node_modules
+    environment:
+      PORT: ${PORT}
+      DB_HOST: postgres
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      WATCHPACK_POLLING: "true"
+    depends_on:
+      - postgres
+      
 
 volumes:
   database-data:
