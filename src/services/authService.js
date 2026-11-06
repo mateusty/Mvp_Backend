@@ -25,3 +25,12 @@ export function gerarToken(usuario) {
 
     return token;
 }
+
+export function userIdPorToken(token) {
+    try {
+        const userInfo = jwt.verify(token, process.env.JWT_SECRET);
+        return userInfo.id;
+    } catch (error) {
+        return null;
+    }
+}

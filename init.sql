@@ -40,5 +40,5 @@ CREATE TABLE IF NOT EXISTS presencas (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     event_id UUID REFERENCES events(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    CONSTRAINT unique_email_event UNIQUE (event_id, email)
+    CONSTRAINT unique_user_event UNIQUE (event_id, user_id)
 );

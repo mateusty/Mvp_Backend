@@ -1,6 +1,6 @@
 import db from "../config/database.js";
 
-export async function marcarPresencaService(eventId, nome, email) {
+export async function marcarPresencaService(eventId, userId) {
     const evento = await db.oneOrNone("SELECT * FROM events WHERE id = $1;", [eventId]);
     if (!evento) {
         throw new Error("EVENTO_NAO_ENCONTRADO");
@@ -18,8 +18,8 @@ export async function marcarPresencaService(eventId, nome, email) {
 
     try {
         const novaPresenca = await db.one(
-            "INSERT INTO presencas (event_id, nome, email) VALUES ($1, $2, $3) RETURNING *;",
-            [eventId, nome, email]
+            "INSERT INTO presencas (user_id, event_id) VALUES ($1, $2) RETURNING *;",
+            [userId, eventId]
         );
         return novaPresenca;
     } catch (error) {
@@ -32,7 +32,7 @@ export async function marcarPresencaService(eventId, nome, email) {
 
 export async function desmarcarPresencaService(eventId, email) {
     const resultado = await db.result(
-        `   DELETE FROM presencas
+           `DELETE FROM presencas
             WHERE event_id = $1
                 AND user_id IN (
                     SELECT id FROM users WHERE email = $2

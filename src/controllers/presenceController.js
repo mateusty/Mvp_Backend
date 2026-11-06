@@ -1,16 +1,12 @@
-import db from "../config/database.js";
 import { marcarPresencaService, desmarcarPresencaService } from "../services/presenceService.js";
 
 export async function marcarPresenca(req, res) {
     try {
         const { eventId } = req.params;
-        const { nome, email } = req.body;
+        const token = req.headers.authorization.split(' ')[1];
+        const userId = userIdPorToken(token);
 
-        if (!nome || !email) {
-            return res.status(400).json({ mensagem: "Nome e e-mail são obrigatórios." });
-        }
-
-        const novaPresenca = await marcarPresencaService(eventId, nome, email);
+        const novaPresenca = await marcarPresencaService(eventId, userId);
 
         return res.status(201).json({
             mensagem: "Presença marcada com sucesso.",
@@ -36,18 +32,6 @@ export async function desmarcarPresenca(req, res) {
     try {
         const { eventId, id } = req.params;
         const { email } = req.body || {};
-
-       
-        if (id) {
-            const resultado = await db.result("DELETE FROM presencas WHERE id = $1;", [id]);
-            
-            if (resultado.rowCount === 0) {
-                return res.status(404).json({ mensagem: "Presença não encontrada." });
-            }
-
-            return res.status(200).json({ mensagem: "Presença removida com sucesso!" });
-        }
-
         
         if (!email) {
             return res.status(400).json({ mensagem: "E-mail é obrigatório para desmarcar." });
