@@ -12,10 +12,10 @@ export async function doRegister(req, res) {
 
     try {
 
-        const { email, password } = req.body;
+        const { email, password, nome } = req.body;
 
 
-        if (!email || !password) {
+        if (!email || !password || !nome) {
 
             return res.status(400).json({
                 mensagem: "Email e senha são obrigatórios"
@@ -34,6 +34,7 @@ export async function doRegister(req, res) {
 
 
         const usuario = await cadastrarUsuario({
+            nome,
             email,
             password
         });

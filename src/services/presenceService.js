@@ -1,4 +1,4 @@
-import db from "../config/database.js";
+import db from "../config/dataBase.js";
 
 export async function marcarPresencaService(eventId, userId) {
     const evento = await db.oneOrNone("SELECT * FROM events WHERE id = $1;", [eventId]);

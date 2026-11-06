@@ -1,9 +1,10 @@
+import { userIdPorToken } from "../services/authService.js";
 import { marcarPresencaService, desmarcarPresencaService } from "../services/presenceService.js";
 
 export async function marcarPresenca(req, res) {
     try {
         const { eventId } = req.params;
-        const token = req.headers.authorization.split(' ')[1];
+        const token = req.headers.authorization?.split(' ')[1] || '';
         const userId = userIdPorToken(token);
 
         const novaPresenca = await marcarPresencaService(eventId, userId);
