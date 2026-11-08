@@ -14,25 +14,22 @@ import {
 } from "../services/authMiddLeware.js";
 
 import { validarCampos } from "../services/validationMiddleware.js";
+import {
+    createEventBodySchema,
+    idParamsSchema,
+    updateEventBodySchema
+} from "../schemas/requestSchemas.js";
 
 const router = express.Router();
 
 router.get("/", listarEventos);
-router.get("/:id", buscarEvento);
+router.get("/:id", validarCampos({ params: idParamsSchema }), buscarEvento);
 
 router.post(
     "/",
     autenticarToken,
     somenteAdmin,
-    validarCampos([
-        "atividade",
-        "descricao",        
-        "localizacao",
-        "parque",
-        "capacidade_maxima",
-        "data_evento",
-        "google_maps_url"  
-    ]),
+    validarCampos({ body: createEventBodySchema }),
     criarEvento
 );
 
@@ -40,6 +37,10 @@ router.put(
     "/:id",
     autenticarToken,
     somenteAdmin,
+    validarCampos({
+        params: idParamsSchema,
+        body: updateEventBodySchema
+    }),
     atualizarEvento
 );
 
@@ -47,6 +48,7 @@ router.delete(
     "/:id",
     autenticarToken,
     somenteAdmin,
+    validarCampos({ params: idParamsSchema }),
     excluirEvento
 );
 

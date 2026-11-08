@@ -26,6 +26,8 @@ tornar a aplicação Front-End um MVP funcional unindo as funcionalidades do bac
 
 ## Técnologias Utilizadas:
 - biblioteca Bcrypt para hash de senhas.
+- Zod para validação dos dados das requisições.
+- Middleware global para padronização do tratamento de erros.
 - thunder-client para teste de endpoint.
 - Postgree para banco de dados.
 - Javascript para criação de servidor http(porta 8080).

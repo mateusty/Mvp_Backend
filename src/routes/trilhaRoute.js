@@ -17,6 +17,12 @@ import {
 import {
   enviarImagemTrilha
 } from "../controllers/UploadController.js";
+import { validarCampos } from "../services/validationMiddleware.js";
+import {
+  createTrilhaBodySchema,
+  idParamsSchema,
+  updateTrilhaBodySchema
+} from "../schemas/requestSchemas.js";
 
 const router = express.Router();
 
@@ -29,12 +35,13 @@ router.post(
   enviarImagemTrilha
 );
 
-router.get("/:id", buscarTrilha);
+router.get("/:id", validarCampos({ params: idParamsSchema }), buscarTrilha);
 
 router.post(
   "/",
   autenticarToken,
   somenteAdmin,
+  validarCampos({ body: createTrilhaBodySchema }),
   criarTrilha
 );
 
@@ -42,6 +49,10 @@ router.put(
   "/:id",
   autenticarToken,
   somenteAdmin,
+  validarCampos({
+    params: idParamsSchema,
+    body: updateTrilhaBodySchema
+  }),
   atualizarTrilha
 );
 
@@ -49,6 +60,7 @@ router.delete(
   "/:id",
   autenticarToken,
   somenteAdmin,
+  validarCampos({ params: idParamsSchema }),
   excluirTrilha
 );
 

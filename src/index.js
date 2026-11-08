@@ -9,6 +9,8 @@ import authRoutes from "./routes/authRoute.js";
 import trilhaRoute from "./routes/trilhaRoute.js";
 import eventRoute from "./routes/eventRoute.js";
 import presenceRoute from "./routes/presenceRoute.js";
+import { AppError } from "./services/AppError.js";
+import { errorMiddleware } from "./services/errorMiddleware.js";
 
 const app = express();
 
@@ -71,10 +73,10 @@ app.use("/eventos", eventRoute);
 app.use("/presencas", presenceRoute);
 
 app.use((req, res) => {
-  return res.status(404).json({
-    mensagem: "Rota não encontrada"
-  });
+  throw new AppError("Rota não encontrada", 404);
 });
+
+app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log(
