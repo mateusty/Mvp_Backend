@@ -1,6 +1,6 @@
+
 import { v4 as uuidv4 } from "uuid";
 import db from "../config/dataBase.js";
-
 
 export async function criarTrilhaService(dados) {
 
@@ -11,9 +11,10 @@ export async function criarTrilhaService(dados) {
         dificuldade: dados.dificuldade,
         distancia_km: dados.distancia_km,
         duracao_minutos: dados.duracao_minutos,
-        localizacao: dados.localizacao
+        localizacao: dados.localizacao,
+        imagem_url: dados.imagem_url || null,
+        parque: dados.parque
     };
-
 
     const trilha = await db.one(
         `
@@ -24,9 +25,10 @@ export async function criarTrilhaService(dados) {
             dificuldade,
             distancia_km,
             duracao_minutos,
-            localizacao
+            localizacao,
+            imagem_url,
+            parque
         )
-
         VALUES (
             $/id/,
             $/nome/,
@@ -34,18 +36,17 @@ export async function criarTrilhaService(dados) {
             $/dificuldade/,
             $/distancia_km/,
             $/duracao_minutos/,
-            $/localizacao/
+            $/localizacao/,
+            $/imagem_url/,
+            $/parque/
         )
-
         RETURNING *;
         `,
         novaTrilha
     );
 
-
     return trilha;
 }
-
 
 export async function listarTrilhasService() {
 
@@ -57,7 +58,6 @@ export async function listarTrilhasService() {
         `
     );
 }
-
 
 export async function buscarTrilhaService(id) {
 
@@ -71,32 +71,29 @@ export async function buscarTrilhaService(id) {
     );
 }
 
-
 export async function atualizarTrilhaService(id, dados) {
 
     const parametros = {
         id,
-
         nome: dados.nome ?? null,
-
         descricao: dados.descricao ?? null,
-
         dificuldade: dados.dificuldade ?? null,
-
         distancia_km: dados.distancia_km ?? null,
-
         duracao_minutos: dados.duracao_minutos ?? null,
-
-        localizacao: dados.localizacao ?? null
+        localizacao: dados.localizacao ?? null,
+        imagem_url: dados.imagem_url ?? null,
+        parque: dados.parque ?? null
     };
-
 
     return await db.oneOrNone(
         `
         UPDATE trilhas
 
         SET
-            nome = COALESCE($/nome/, nome),
+            nome = COALESCE(
+                $/nome/,
+                nome
+            ),
 
             descricao = COALESCE(
                 $/descricao/,
@@ -121,6 +118,16 @@ export async function atualizarTrilhaService(id, dados) {
             localizacao = COALESCE(
                 $/localizacao/,
                 localizacao
+            ),
+
+            imagem_url = COALESCE(
+                $/imagem_url/,
+                imagem_url
+            ),
+
+            parque = COALESCE(
+                $/parque/,
+                parque
             )
 
         WHERE id = $/id/
@@ -130,7 +137,6 @@ export async function atualizarTrilhaService(id, dados) {
         parametros
     );
 }
-
 
 export async function excluirTrilhaService(id) {
 

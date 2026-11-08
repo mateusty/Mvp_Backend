@@ -1,64 +1,107 @@
-import { v4 as uuidv4 } from "uuid";
-
-// simulação de banco para teste
-const eventosBancoMock = [
-    {
-        id: "d3b07384-d113-424a-a764-585a2100824e",
-        titulo: "Caminhada Ecológica PARNASO",
-        descricao: "Trilha guiada com observação da fauna e flora local.",
-        local: "Parque Nacional da Serra dos Órgãos",
-        tema: "Eco-Turismo",
-        data_horario: "2026-10-20T09:00:00.000Z",
-        limite_pessoas: 15,
-        created_at: new Date().toISOString()
-    }
-];
+import db from "../config/database.js";
 
 export async function criarEventoService(dados) {
-    const novoEvento = {
-        id: uuidv4(),
-        titulo: dados.titulo,
-        descricao: dados.descricao || null,
-        local: dados.local,
-        tema: dados.tema,
-        data_horario: dados.data_horario,
-        limite_pessoas: dados.limite_pessoas,
-        created_at: new Date().toISOString()
-    };
+    const {
+        atividade,
+        descricao,
+        localizacao,
+        parque,
+        capacidade_maxima,
+        data_evento,
+        google_maps_url
+    } = dados;
 
-    eventosBancoMock.push(novoEvento);
-    return novoEvento;
+    const dataFormatada = data_evento ? data_evento.replace("T", " ") + (data_evento.length === 16 ? ":00" : "") : null;
+
+    const query = `
+        INSERT INTO events (atividade, descricao, localizacao, parque, capacidade_maxima, data_evento, google_maps_url)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING *;
+    `;
+
+    const values = [
+        atividade,
+        descricao,
+        localizacao,
+        parque,
+        capacidade_maxima,
+        dataFormatada,
+        google_maps_url
+    ];
+
+   
+    return await db.one(query, values);
 }
 
 export async function listarEventosService() {
-    return eventosBancoMock;
+    const query = `
+        SELECT 
+            e.*,
+            COALESCE(
+                json_agg(
+                    json_build_object(
+                        'id', p.id,
+                        'nome', p.nome,
+                        'email', p.email
+                    )
+                ) FILTER (WHERE p.id IS NOT NULL), 
+                '[]'
+            ) AS participantes
+        FROM events e
+        LEFT JOIN presencas p ON e.id = p.event_id
+        GROUP BY e.id
+        ORDER BY e.data_evento ASC;
+    `;
+
+    return await db.any(query);
 }
 
 export async function buscarEventoService(id) {
-    return eventosBancoMock.find(e => e.id === id) || null;
+  
+    return await db.oneOrNone("SELECT * FROM events WHERE id = $1;", [id]);
 }
 
 export async function atualizarEventoService(id, dados) {
-    const index = eventosBancoMock.findIndex(e => e.id === id);
-    if (index === -1) return null;
+    const eventoAtual = await buscarEventoService(id);
+    if (!eventoAtual) return null;
 
-    eventosBancoMock[index] = {
-        ...eventosBancoMock[index],
-        titulo: dados.titulo ?? eventosBancoMock[index].titulo,
-        descricao: dados.descricao ?? eventosBancoMock[index].descricao,
-        local: dados.local ?? eventosBancoMock[index].local,
-        tema: dados.tema ?? eventosBancoMock[index].tema,
-        data_horario: dados.data_horario ?? eventosBancoMock[index].data_horario,
-        limite_pessoas: dados.limite_pessoas ?? eventosBancoMock[index].limite_pessoas
-    };
+    const atividade = dados.atividade ?? eventoAtual.atividade;
+    const descricao = dados.descricao ?? eventoAtual.descricao;
+    const localizacao = dados.localizacao ?? eventoAtual.localizacao;
+    const parque = dados.parque ?? eventoAtual.parque;
+    const capacidade_maxima = dados.capacidade_maxima ?? eventoAtual.capacidade_maxima;
+    
+    let data_evento = dados.data_evento ?? eventoAtual.data_evento;
+    if (dados.data_evento) {
+        data_evento = dados.data_evento.replace("T", " ") + (dados.data_evento.length === 16 ? ":00" : "");
+    }
 
-    return eventosBancoMock[index];
+    const google_maps_url = dados.google_maps_url ?? eventoAtual.google_maps_url;
+
+    const query = `
+        UPDATE events
+        SET atividade = $1, descricao = $2, localizacao = $3, parque = $4, capacidade_maxima = $5, data_evento = $6, google_maps_url = $7
+        WHERE id = $8
+        RETURNING *;
+    `;
+
+    const values = [
+        atividade,
+        descricao,
+        localizacao,
+        parque,
+        capacidade_maxima,
+        data_evento,
+        google_maps_url,
+        id
+    ];
+
+    return await db.one(query, values);
 }
 
 export async function excluirEventoService(id) {
-    const index = eventosBancoMock.findIndex(e => e.id === id);
-    if (index === -1) return null;
-
-    const [eventoRemovido] = eventosBancoMock.splice(index, 1);
-    return eventoRemovido;
+    return await db.oneOrNone(
+        "DELETE FROM events WHERE id = $1 RETURNING *;",
+        [id]
+    );
 }
