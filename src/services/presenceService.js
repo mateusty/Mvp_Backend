@@ -30,14 +30,12 @@ export async function marcarPresencaService(eventId, userId) {
     }
 }
 
-export async function desmarcarPresencaService(eventId, email) {
+export async function desmarcarPresencaService(eventId, userId) {
     const resultado = await db.result(
            `DELETE FROM presencas
             WHERE event_id = $1
-                AND user_id IN (
-                    SELECT id FROM users WHERE email = $2
-                );`,
-        [eventId, email]
+            AND user_id = $2;`,
+        [eventId, userId]
     );
     
     return resultado.rowCount > 0;

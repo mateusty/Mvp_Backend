@@ -1,11 +1,11 @@
-import { userIdPorToken } from "../services/authService.js";
+import { userIdPorToken, userPorToken } from "../services/authService.js";
 import { marcarPresencaService, desmarcarPresencaService } from "../services/presenceService.js";
 
 export async function marcarPresenca(req, res) {
     try {
         const { eventId } = req.params;
         const token = req.headers.authorization?.split(' ')[1] || '';
-        const userId = userIdPorToken(token);
+        const userId = userPorToken(token).id;
 
         const novaPresenca = await marcarPresencaService(eventId, userId);
 
@@ -31,14 +31,11 @@ export async function marcarPresenca(req, res) {
 
 export async function desmarcarPresenca(req, res) {
     try {
-        const { eventId, id } = req.params;
-        const { email } = req.body || {};
-        
-        if (!email) {
-            return res.status(400).json({ mensagem: "E-mail é obrigatório para desmarcar." });
-        }
+        const { eventId } = req.params;
+        const token = req.headers.authorization?.split(' ')[1] || '';
+        const userId = userPorToken(token).id;
 
-        const presencaRemovida = await desmarcarPresencaService(eventId, email);
+        const presencaRemovida = await desmarcarPresencaService(eventId, userId);
 
         return res.status(200).json({
             mensagem: "Presença removida com sucesso.",
