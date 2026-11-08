@@ -1,5 +1,4 @@
 import { validate as validarUUID } from "uuid";
-
 import {
     criarEventoService,
     listarEventosService,
@@ -10,32 +9,38 @@ import {
 
 export async function criarEvento(req, res) {
     try {
+        if (req.user && req.user.role !== 'admin') {
+            return res.status(403).json({
+                mensagem: "Acesso negado. Apenas administradores podem criar eventos."
+            });
+        }
+
         const {
-            titulo,
+            atividade,
             descricao,
-            local,
-            tema,
-            data_horario,
-            limite_pessoas,
-            google_maps_url // Adicionado como opcional
+            localizacao,
+            parque,
+            capacidade_maxima,
+            data_evento,
+            google_maps_url
         } = req.body;
 
-        const capacidade = Number(limite_pessoas);
+        const capacidade = Number(capacidade_maxima);
 
         if (Number.isNaN(capacidade) || capacidade <= 0) {
             return res.status(400).json({
-                mensagem: "O limite de pessoas deve ser um número maior que zero."
+                mensagem: "A capacidade máxima deve ser um número maior que zero."
             });
         }
 
         const dadosEvento = {
-            titulo: titulo.trim(),
+            atividade: atividade?.trim(),
             descricao: descricao?.trim() || null,
-            local: local.trim(),
-            tema: tema.trim(),
-            data_horario,
-            limite_pessoas: capacidade,
-            google_maps_url: google_maps_url?.trim() || null // Opcional: salva o link limpo ou null se não enviado
+            localizacao: localizacao?.trim(),
+            parque: parque?.trim(),
+            capacidade_maxima: capacidade,
+            data_evento,
+            google_maps_url: google_maps_url?.trim() || null
         };
 
         const evento = await criarEventoService(dadosEvento);
@@ -56,7 +61,7 @@ export async function criarEvento(req, res) {
 export async function listarEventos(req, res) {
     try {
         const eventos = await listarEventosService();
-        return res.status(200).json(eventos);
+        return res.status(200).json(eventos || []); // Garante que envia um array mesmo se vier vazio
     } catch (erro) {
         console.error(erro);
         return res.status(500).json({
@@ -95,6 +100,12 @@ export async function buscarEvento(req, res) {
 
 export async function atualizarEvento(req, res) {
     try {
+        if (req.user && req.user.role !== 'admin') {
+            return res.status(403).json({
+                mensagem: "Acesso negado. Apenas administradores podem atualizar eventos."
+            });
+        }
+
         const { id } = req.params;
 
         if (!validarUUID(id)) {
@@ -105,17 +116,16 @@ export async function atualizarEvento(req, res) {
 
         const dados = { ...req.body };
 
-        if (dados.limite_pessoas !== undefined) {
-            dados.limite_pessoas = Number(dados.limite_pessoas);
+        if (dados.capacidade_maxima !== undefined) {
+            dados.capacidade_maxima = Number(dados.capacidade_maxima);
 
-            if (Number.isNaN(dados.limite_pessoas) || dados.limite_pessoas <= 0) {
+            if (Number.isNaN(dados.capacidade_maxima) || dados.capacidade_maxima <= 0) {
                 return res.status(400).json({
-                    mensagem: "O limite de pessoas deve ser maior que zero."
+                    mensagem: "A capacidade máxima deve ser maior que zero."
                 });
             }
         }
 
-        // Se o google_maps_url vier na atualização, tratamos opcionalmente
         if (dados.google_maps_url !== undefined) {
             dados.google_maps_url = dados.google_maps_url?.trim() || null;
         }
@@ -143,6 +153,12 @@ export async function atualizarEvento(req, res) {
 
 export async function excluirEvento(req, res) {
     try {
+        if (req.user && req.user.role !== 'admin') {
+            return res.status(403).json({
+                mensagem: "Acesso negado. Apenas administradores podem excluir eventos."
+            });
+        }
+
         const { id } = req.params;
 
         if (!validarUUID(id)) {

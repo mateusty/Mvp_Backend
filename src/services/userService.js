@@ -10,6 +10,9 @@ import {
 
 export async function cadastrarUsuario(user) {
 
+    const nome = 
+        user.nome.trim();
+
     const email =
         user.email.trim().toLowerCase();
 
@@ -20,7 +23,7 @@ export async function cadastrarUsuario(user) {
     const usuarioCriado = await db.one(
         `
         INSERT INTO users (
-            id,
+            nome_usuario,
             email,
             password_hash
         )
@@ -28,13 +31,12 @@ export async function cadastrarUsuario(user) {
         VALUES ($1, $2, $3)
 
         RETURNING
-            id,
             email,
             role,
             created_at
         `,
         [
-            uuidv4(),
+            nome,
             email,
             hash
         ]

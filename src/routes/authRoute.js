@@ -17,7 +17,7 @@ const router = express.Router();
 
 router.post(
     "/register",
-    validarCampos(["email", "password"]),
+    validarCampos(["nome", "email", "password"]),
     doRegister
 );
 
