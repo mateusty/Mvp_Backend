@@ -1,9 +1,10 @@
 import db from "../config/dataBase.js";
+import { AppError } from "./AppError.js";
 
 export async function marcarPresencaService(eventId, userId) {
     const evento = await db.oneOrNone("SELECT * FROM events WHERE id = $1;", [eventId]);
     if (!evento) {
-        throw new Error("EVENTO_NAO_ENCONTRADO");
+        throw new AppError("Evento não encontrado.", 404);
     }
 
     const totalPresencas = await db.one(
@@ -13,7 +14,7 @@ export async function marcarPresencaService(eventId, userId) {
     );
 
     if (totalPresencas >= evento.capacidade_maxima) {
-        throw new Error("EVENTO_LOTADO");
+        throw new AppError("Este evento já atingiu a capacidade máxima.", 400);
     }
 
     try {
@@ -24,7 +25,7 @@ export async function marcarPresencaService(eventId, userId) {
         return novaPresenca;
     } catch (error) {
         if (error.code === '23505') {
-            throw new Error("JA_INSCRITO");
+            throw new AppError("Este usuário já está inscrito neste evento.", 409);
         }
         throw error;
     }

@@ -6,6 +6,7 @@ import { mkdirSync } from "node:fs";
 import { rename, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { AppError } from "../services/AppError.js";
 
 const diretorioUploads = fileURLToPath(
   new URL("../../uploads/trilhas/", import.meta.url)
@@ -41,7 +42,7 @@ const upload = multer({
   fileFilter: (req, file, callback) => {
     if (!formatosPermitidos.includes(file.mimetype)) {
       return callback(
-        new Error("Envie uma imagem JPG, PNG ou WebP.")
+        new AppError("Envie uma imagem JPG, PNG ou WebP.", 400)
       );
     }
 
@@ -49,31 +50,16 @@ const upload = multer({
   }
 });
 
-export function enviarImagemTrilha(req, res) {
+export function enviarImagemTrilha(req, res, next) {
 
   upload.single("imagem")(req, res, async (erroUpload) => {
 
     if (erroUpload) {
-      if (erroUpload instanceof multer.MulterError) {
-        return res.status(
-          erroUpload.code === "LIMIT_FILE_SIZE" ? 413 : 400
-        ).json({
-          mensagem:
-            erroUpload.code === "LIMIT_FILE_SIZE"
-              ? "A imagem deve ter no máximo 5 MB."
-              : "Erro ao receber a imagem."
-        });
-      }
-
-      return res.status(400).json({
-        mensagem: erroUpload.message
-      });
+      return next(erroUpload);
     }
 
     if (!req.file) {
-      return res.status(400).json({
-        mensagem: "Selecione uma imagem."
-      });
+      return next(new AppError("Selecione uma imagem.", 400));
     }
 
     let caminhoArquivo = req.file.path;
@@ -82,11 +68,9 @@ export function enviarImagemTrilha(req, res) {
       const tipo = await fileTypeFromFile(req.file.path);
 
       if (!tipo || !formatosPermitidos.includes(tipo.mime)) {
-        await unlink(req.file.path).catch(() => {});
+        await unlink(req.file.path);
 
-        return res.status(400).json({
-          mensagem: "O arquivo não é uma imagem válida."
-        });
+        return next(new AppError("O arquivo não é uma imagem válida.", 400));
       }
 
       const identificador = req.file.filename.replace(
@@ -119,13 +103,15 @@ export function enviarImagemTrilha(req, res) {
       });
 
     } catch (erro) {
-      await unlink(caminhoArquivo).catch(() => {});
+      try {
+        await unlink(caminhoArquivo);
+      } catch (erroLimpeza) {
+        if (erroLimpeza.code !== "ENOENT") {
+          console.error("Erro ao remover arquivo de upload:", erroLimpeza);
+        }
+      }
 
-      console.error("Erro no upload:", erro);
-
-      return res.status(500).json({
-        mensagem: "Erro interno ao salvar imagem."
-      });
+      return next(erro);
     }
   });
 }
