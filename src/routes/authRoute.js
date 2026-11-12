@@ -12,18 +12,22 @@ import {
 } from "../services/authMiddLeware.js";
 
 import { validarCampos } from "../services/validationMiddleware.js";
+import {
+    loginBodySchema,
+    registerBodySchema
+} from "../schemas/requestSchemas.js";
 
 const router = express.Router();
 
 router.post(
     "/register",
-    validarCampos(["nome", "email", "password"]),
+    validarCampos({ body: registerBodySchema }),
     doRegister
 );
 
 router.post(
     "/login",
-    validarCampos(["email", "password"]),
+    validarCampos({ body: loginBodySchema }),
     doLogin
 );
 

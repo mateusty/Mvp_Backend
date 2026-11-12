@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { AppError } from "./AppError.js";
 
 
 export function autenticarToken(req, res, next) {
@@ -9,11 +10,7 @@ export function autenticarToken(req, res, next) {
 
 
     if (tipo !== "Bearer" || !token) {
-
-        return res.status(401).json({
-            mensagem: "Acesso negado. Token não fornecido!"
-        });
-
+        throw new AppError("Acesso negado. Token não fornecido!", 401);
     }
 
 
@@ -28,12 +25,8 @@ export function autenticarToken(req, res, next) {
 
         return next();
 
-    } catch (erro) {
-
-        return res.status(401).json({
-            mensagem: "Token inválido ou expirado!"
-        });
-
+    } catch {
+        throw new AppError("Token inválido ou expirado!", 401);
     }
 }
 
@@ -42,10 +35,7 @@ export function somenteAdmin(req, res, next) {
 
     if (!req.usuario || req.usuario.role !== "admin") {
 
-        return res.status(403).json({
-            mensagem: "Acesso permitido somente para administradores!"
-        });
-
+        throw new AppError("Acesso permitido somente para administradores!", 403);
     }
 
     return next();

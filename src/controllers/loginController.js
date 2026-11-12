@@ -1,7 +1,5 @@
-import {
-    gerarToken
-} from "../services/authService.js";
-
+import { AppError } from "../services/AppError.js";
+import { gerarToken } from "../services/authService.js";
 import {
     cadastrarUsuario,
     logarUsuario,
@@ -9,145 +7,45 @@ import {
 } from "../services/userService.js";
 
 export async function doRegister(req, res) {
+    const { email, password, nome } = req.body;
+    const usuario = await cadastrarUsuario({ nome, email, password });
 
-    try {
-
-        const { email, password, nome } = req.body;
-
-
-        if (!email || !password || !nome) {
-
-            return res.status(400).json({
-                mensagem: "Email e senha são obrigatórios"
-            });
-
-        }
-
-
-        if (password.length < 6) {
-
-            return res.status(400).json({
-                mensagem: "A senha deve possuir pelo menos 6 caracteres"
-            });
-
-        }
-
-
-        const usuario = await cadastrarUsuario({
-            nome,
-            email,
-            password
-        });
-
-
-        return res.status(201).json({
-            mensagem: "Usuário cadastrado com sucesso",
-            usuario: usuario
-        });
-
-    } catch (erro) {
-
-        console.error(erro);
-
-
-        if (erro.code === "23505") {
-
-            return res.status(409).json({
-                mensagem: "Este email já está cadastrado"
-            });
-
-        }
-
-
-        return res.status(500).json({
-            mensagem: "Erro interno no servidor"
-        });
-
-    }
+    return res.status(201).json({
+        mensagem: "Usuário cadastrado com sucesso",
+        usuario
+    });
 }
-
 
 export async function doLogin(req, res) {
+    const { email, password } = req.body;
+    const usuario = await logarUsuario({ email, password });
 
-    try {
-
-        const { email, password } = req.body;
-
-
-        if (!email || !password) {
-
-            return res.status(400).json({
-                mensagem: "Email e senha são obrigatórios"
-            });
-
-        }
-
-
-        const usuario = await logarUsuario({
-            email,
-            password
-        });
-
-
-        if (!usuario) {
-
-            return res.status(401).json({
-                mensagem: "Email ou senha incorretos"
-            });
-
-        }
-
-
-        const token = gerarToken(usuario);
-
-
-        return res.status(200).json({
-
-            mensagem: "Login realizado com sucesso",
-
-            token: token,
-
-            usuario: {
-                id: usuario.id,
-                email: usuario.email,
-                role: usuario.role
-            }
-
-        });
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        return res.status(500).json({
-            mensagem: "Erro interno no servidor"
-        });
-
+    if (!usuario) {
+        throw new AppError("Email ou senha incorretos", 401);
     }
+
+    const token = gerarToken(usuario);
+
+    return res.status(200).json({
+        mensagem: "Login realizado com sucesso",
+        token,
+        usuario: {
+            id: usuario.id,
+            email: usuario.email,
+            role: usuario.role
+        }
+    });
 }
 
-export async function getMe(req, res){
+export async function getMe(req, res) {
+    const usuario = await buscarUsuarioPorId(req.usuario.id);
 
-    try {
-
-        const usuario = await buscarUsuarioPorId(req.usuario.id);
-
-        if (!usuario) {
-            return res.status(404).json({
-                mensagem: "Usuário não encontrado."
-            });
-        }
-
-        return res.status(200).json({
-            mensagem: "Dados do Usuário.",
-            usuario
-        });
-
-    } catch (erro) {
-        console.error(erro);
-
-        return res.status(500).json({
-            mensagem: "Erro interno no servidor."
-        });
+    if (!usuario) {
+        throw new AppError("Usuário não encontrado.", 404);
     }
+
+    return res.status(200).json({
+        mensagem: "Dados do Usuário.",
+        usuario
+    });
 }

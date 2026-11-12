@@ -1,41 +1,14 @@
-export function validarCampos(camposEsperados) {
-
+export function validarCampos(esquemas) {
     return (req, res, next) => {
+        for (const [origem, esquema] of Object.entries(esquemas)) {
+            const resultado = esquema.safeParse(req[origem]);
 
-        const camposRecebidos =
-            Object.keys(req.body || {});
+            if (!resultado.success) {
+                return next(resultado.error);
+            }
 
-
-        const camposFaltando =
-            camposEsperados.filter(
-                campo =>
-                    !camposRecebidos.includes(campo)
-            );
-
-
-        const camposExtras =
-            camposRecebidos.filter(
-                campo =>
-                    !camposEsperados.includes(campo)
-            );
-
-
-        if (
-            camposFaltando.length > 0 ||
-            camposExtras.length > 0
-        ) {
-
-            return res.status(400).json({
-
-                mensagem:
-                    "Campos inválidos na requisição.",
-
-                camposEsperados,
-                camposFaltando,
-                camposExtras
-            });
+            req[origem] = resultado.data;
         }
-
 
         return next();
     };
