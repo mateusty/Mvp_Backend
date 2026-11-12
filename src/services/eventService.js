@@ -41,14 +41,15 @@ export async function listarEventosService() {
                 json_agg(
                     json_build_object(
                         'id', p.id,
-                        'nome', p.nome,
-                        'email', p.email
+                        'nome', u.nome_usuario,
+                        'email', u.email
                     )
                 ) FILTER (WHERE p.id IS NOT NULL), 
                 '[]'
             ) AS participantes
         FROM events e
         LEFT JOIN presencas p ON e.id = p.event_id
+        LEFT JOIN users u ON p.user_id = u.id
         GROUP BY e.id
         ORDER BY e.data_evento ASC;
     `;
