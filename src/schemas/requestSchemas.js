@@ -14,12 +14,12 @@ export const eventIdParamsSchema = z.object({
 
 export const registerBodySchema = z.object({
     nome: textoObrigatorio,
-    email: z.string().trim().email("Email inválido."),
+    email: z.trim().email("Email inválido."),
     password: z.string().min(6, "A senha deve possuir pelo menos 6 caracteres.")
 }).strict();
 
 export const loginBodySchema = z.object({
-    email: z.string().trim().email("Email inválido."),
+    email: z.trim().email("Email inválido."),
     password: z.string().min(1, "A senha é obrigatória.")
 }).strict();
 
@@ -28,7 +28,7 @@ const eventBodyFields = {
     descricao: z.string().trim().nullable(),
     localizacao: textoObrigatorio,
     parque: textoObrigatorio,
-    capacidade_maxima: z.coerce.number().finite().positive(
+    capacidade_maxima: z.coerce.number().positive(
         "A capacidade máxima deve ser um número maior que zero."
     ),
     data_evento: textoObrigatorio,
@@ -53,7 +53,7 @@ const trilhaBodyFields = {
     nome: textoObrigatorio,
     descricao: z.string().trim().nullable().optional(),
     dificuldade: dificuldadeSchema,
-    distancia_km: z.coerce.number().finite().positive(
+    distancia_km: z.coerce.number().positive(
         "A distância deve ser maior que zero."
     ),
     duracao_minutos: z.coerce.number().int().positive(
