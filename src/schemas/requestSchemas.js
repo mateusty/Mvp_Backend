@@ -14,12 +14,12 @@ export const eventIdParamsSchema = z.object({
 
 export const registerBodySchema = z.object({
     nome: textoObrigatorio,
-    email: z.trim().email("Email inválido."),
+    email: z.email("Email inválido.").trim(),
     password: z.string().min(6, "A senha deve possuir pelo menos 6 caracteres.")
 }).strict();
 
 export const loginBodySchema = z.object({
-    email: z.trim().email("Email inválido."),
+    email: z.email("Email inválido.").trim(),
     password: z.string().min(1, "A senha é obrigatória.")
 }).strict();
 
